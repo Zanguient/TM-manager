@@ -1,6 +1,6 @@
-name                      : MyServer
-version                   : 4.0.0
-author                    : Totaljs.com Ltd
+name                      : TM-manager
+version                   : 4.0.1
+author                    : ToManage
 
 superadmin                : admin:admin
 superadmin-templates      : https://modules.totaljs.com/superadmin.json
