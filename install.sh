@@ -49,6 +49,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y mongodb-org
     apt-get install -y texlive-latex-base
     apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
+    apt-get upgrade -y
     
     curl https://get.acme.sh | sh
     mkdir /www/
