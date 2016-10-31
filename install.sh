@@ -38,7 +38,7 @@ printf "${RED}This setup requires the installation of the nginx, nodejs, mongodb
     apt-get install -y cron
     apt-get install -y python-software-properties
     apt-get install -y software-properties-common
-    curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+    curl -sL https://deb.nodesource.com/setup_4.x | bash -
     echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
     apt-get update
     apt-get install -y nginx
