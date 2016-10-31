@@ -15,7 +15,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 #User Consent
-printf "${RED}This setup requires the installation of the nginx, nodejs and graphicsmagick packages using apt-get!${NC}\n"
+printf "${RED}This setup requires the installation of the nginx, nodejs, mongodb, latex and graphicsmagick packages using apt-get!${NC}\n"
 read -p "Do you wish to permit this ? (y/n) : " userConsent
 
 if [ "$userConsent" == "y" ]; then
@@ -37,8 +37,8 @@ if [ "$userConsent" == "y" ]; then
     #Prerequisits
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-    apt-get install python-software-properties
-    apt-get install software-properties-common
+    apt-get install -y python-software-properties
+    apt-get install -y software-properties-common
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
     echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
     apt-get update
@@ -95,7 +95,7 @@ if [ "$userConsent" == "y" ]; then
     service nginx reload
 
     rm /www/manager/user.guid
-    read -p "Which user should SuperAdmin use to run your applications ? (default root) : " user
+    read -p "Which user should TM-Manager use to run your applications ? (default root) : " user
     if id "$user" >/dev/null 2>&1; then
         printf "Using user -> %s\n" "$user"
         uid=$(id -u ${user})
@@ -106,7 +106,7 @@ if [ "$userConsent" == "y" ]; then
         echo "root:0:0" >> /www/manager/user.guid
     fi
 
-    read -p "Do you wish to install cron job to start SuperAdmin automaticly after server restart? (y/n) :" autorestart
+    read -p "Do you wish to install cron job to start TM-Manager automaticly after server restart? (y/n) :" autorestart
     if [ "$autorestart" == "y" ]; then
         #write out current crontab
         crontab -l > mycron
