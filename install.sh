@@ -37,6 +37,7 @@ if [ "$userConsent" == "y" ]; then
     #Prerequisits
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+    apt-get install -y cron
     apt-get install -y python-software-properties
     apt-get install -y software-properties-common
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
