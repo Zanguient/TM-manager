@@ -1,8 +1,8 @@
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-printf "${RED}SuperAdmin Installtion${NC}\n"
+printf "${RED}TM-Manager Installtion${NC}\n"
 echo "Installion assumes a clean install of Ubuntu 14.04"
-echo "Installion prompts are for creating a subdomain 'superadmin for a domain name 'domain.tld' and accessing superadmin via it"
+echo "Installion prompts are for creating a subdomain 'tm-manager for a domain name 'domain.tld' and accessing tm-manager via it"
 echo "you wil be prompted to provide both."
 echo "By default, a cer-key pair is generated using OpenSSL for HTTPS, if HTTPS is enabled"
 echo "You can find the cer-key pair in the /etc/ssl/<domain>/ folder."
@@ -24,7 +24,7 @@ if [ "$userConsent" == "y" ]; then
 
     #User Input
     read -p "Domain (eg, domain.tk): " domain
-    read -p "Subdomain (eg, superadmin): " subdomain
+    read -p "Subdomain (eg, manager): " subdomain
 
     if [ "$httpsEn" == "y" ]; then
         read -p "Country Name (2 letter code) (eg, IN): " certC
@@ -36,13 +36,19 @@ if [ "$userConsent" == "y" ]; then
 
     #Prerequisits
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
     apt-get install python-software-properties
     apt-get install software-properties-common
     curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+    echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
     apt-get update
     apt-get install -y nginx
     apt-get install -y nodejs
     apt-get install -y graphicsmagick
+    apt-get install -y mongodb-org
+    apt-get install -y texlive-latex-base
+    apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
+    
     curl https://get.acme.sh | sh
     mkdir /www/
     mkdir /www/logs/
@@ -52,6 +58,8 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
     mkdir /www/node_modules/
     cd /www/
+    npm install -g bower
+    npm install -g gulp
     npm install total.js@beta
 
     #Key Generation
@@ -65,37 +73,37 @@ if [ "$userConsent" == "y" ]; then
     #Configuration
     cd
     apt-get install -y git
-    git clone https://github.com/totaljs/superadmin
-    mv superadmin /www/
+    git clone https://github.com/ToManage/manager.git
+    mv manager /www/
     cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-    cp /www/superadmin/nginx.conf /etc/nginx/nginx.conf
-    cp /www/superadmin/superadmin.conf /www/nginx/
+    cp /www/manager/nginx.conf /etc/nginx/nginx.conf
+    cp /www/manager/manager.conf /www/nginx/
     repexp=s/#domain#/$domain/g
     subrepexp=s/#subdomain#/$subdomain/g
     httpenexp=s/#disablehttp#//g
     httpsenexp=s/#disablehttps#//g
 
     if [ "$httpEn" == "y" ]; then
-        sed -i -e $httpenexp /www/nginx/superadmin.conf
+        sed -i -e $httpenexp /www/nginx/manager.conf
     fi
     if [ "$httpsEn" == "y" ]; then
-        sed -i -e $httpsenexp /www/nginx/superadmin.conf
+        sed -i -e $httpsenexp /www/nginx/manager.conf
     fi
 
-    sed -i -e $repexp /www/nginx/superadmin.conf
-    sed -i -e $subrepexp /www/nginx/superadmin.conf
+    sed -i -e $repexp /www/nginx/manager.conf
+    sed -i -e $subrepexp /www/nginx/manager.conf
     service nginx reload
 
-    rm /www/superadmin/user.guid
+    rm /www/manager/user.guid
     read -p "Which user should SuperAdmin use to run your applications ? (default root) : " user
     if id "$user" >/dev/null 2>&1; then
         printf "Using user -> %s\n" "$user"
         uid=$(id -u ${user})
         gid=$(id -g ${user})
-        echo "$user:$uid:$gid" >> /www/superadmin/user.guid
+        echo "$user:$uid:$gid" >> /www/manager/user.guid
     else
         printf "User %s does not exist. Using root instead.\n" "$user"
-        echo "root:0:0" >> /www/superadmin/user.guid
+        echo "root:0:0" >> /www/manager/user.guid
     fi
 
     read -p "Do you wish to install cron job to start SuperAdmin automaticly after server restart? (y/n) :" autorestart
@@ -103,14 +111,14 @@ if [ "$userConsent" == "y" ]; then
         #write out current crontab
         crontab -l > mycron
         #check cron job exists if not add it
-        crontab -l | grep '@reboot /bin/bash /www/superadmin/run.sh' || echo '@reboot /bin/bash /www/superadmin/run.sh' >> mycron
+        crontab -l | grep '@reboot /bin/bash /www/manager/run.sh' || echo '@reboot /bin/bash /www/manager/run.sh' >> mycron
         crontab mycron
         rm mycron
         echo "Cron job added."
     fi
 
     #Starting
-    /bin/bash /www/superadmin/run.sh
+    /bin/bash /www/manager/run.sh
 
 else
     echo "Sorry, this installation cannot continue."
