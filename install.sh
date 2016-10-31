@@ -16,9 +16,7 @@ fi
 
 #User Consent
 printf "${RED}This setup requires the installation of the nginx, nodejs, mongodb, latex and graphicsmagick packages using apt-get!${NC}\n"
-read -p "Do you wish to permit this ? (y/n) : " userConsent
 
-if [ "$userConsent" == "y" ]; then
     read -p "HTTP ? (y/n) : " httpEn
     read -p "HTTPS ? (y/n) : " httpsEn
 
@@ -120,7 +118,3 @@ if [ "$userConsent" == "y" ]; then
 
     #Starting
     /bin/bash /www/manager/run.sh
-
-else
-    echo "Sorry, this installation cannot continue."
-fi
