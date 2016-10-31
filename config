@@ -3,7 +3,7 @@ version                   : 4.0.1
 author                    : ToManage
 
 superadmin                : admin:admin
-superadmin-templates      : https://modules.totaljs.com/superadmin.json
+superadmin-templates      : http://modules.tomanage.fr/manager.json
 
 // Custom SMTP settings
 mail.smtp                 : YOUR.SMTPSERVER.COM
