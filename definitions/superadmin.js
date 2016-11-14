@@ -496,12 +496,11 @@ SuperAdmin.ssl = function(url, generate, callback, renew, second) {
 };
 
 SuperAdmin.sslexists = function(url, second, callback) {
-	F.path.exists(Path.join(CONFIG('directory-ssl'), url, 'ca.cer'), function(e1) {
-		if (!second)
-			return callback(e1);
-		F.path.exists(Path.join(CONFIG('directory-ssl'), second, 'ca.cer'), function(e2) {
-			callback(e1, e2);
-		});
+	Fs.readFile(Path.join(CONFIG('directory-ssl'), url, url + '.conf'), function(err, data) {
+		if (err)
+			callback(false, false);
+		else
+			callback(true, second && data.toString('utf8').indexOf('Le_Alt="{0}"'.format(second)) !== -1);
 	});
 };
 
@@ -645,10 +644,10 @@ SuperAdmin.backup = function(callback) {
  * @param {Function(err)} callback
  */
 SuperAdmin.reload = function(callback) {
-	Exec('service nginx configtest', function(err, response) {
+	Exec('nginx -t', function(err, response) {
 		if (err)
-			return callback(response);
-		Exec('service nginx reload', (err, response) => callback(err && response));
+			return callback(err.toString());
+		Exec('nginx -s reload', (err, response) => callback(err && response));
 	});
 	return SuperAdmin;
 };
@@ -714,7 +713,6 @@ SuperAdmin.copy = function(filename, target, callback, prepare) {
 SuperAdmin.init = function() {
 	SuperAdmin.load(function() {
 		SuperAdmin.versions(function() {
-
 			APPLICATIONS.wait(function(item, next) {
 
 				if (item.stopped)
@@ -726,9 +724,33 @@ SuperAdmin.init = function() {
 					SuperAdmin.run(item.port, () => next());
 				});
 			});
-
 		});
 	});
+
+	SuperAdmin.logger('init: SuperAdmin');
+	return SuperAdmin;
+};
+
+SuperAdmin.logger = function(message, controller, id) {
+
+	var app;
+
+	if (id) {
+
+		// id == App
+		if (typeof(id.id) === 'string')
+			app = id;
+		else
+			app = APPLICATIONS.findItem('id', id);
+
+		if (app)
+			message = message.format('"' + app.url + '"' + ' --> #' + app.id);
+		else
+			return SuperAdmin;
+
+	}
+
+	message && F.logger('logger', message, controller ? controller.ip ? controller.ip : ip : 'root');
 	return SuperAdmin;
 };
 

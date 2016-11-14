@@ -25,6 +25,8 @@ __SuperAdmin requirements:__
 - `cat`
 - `free`
 - `df`
+- `tail`
+- `last`
 
 __To install SuperAdmin run commands bellow:__
 - run `$ sudo wget https://raw.githubusercontent.com/totaljs/superadmin/master/install.sh`
@@ -50,6 +52,19 @@ __To install SuperAdmin run commands bellow:__
 All data are stored in `/superadmin/databases/` directory. Applications are stored in `application.json`.
 
 ---
+
+## How to upgrade my older SuperAdmin version?
+
+Don't worry, it's very easy.
+
+- backup file `/databases/applications.json`
+- backup your credentials in `/config` file (only crendetials, nothing more)
+- copy all directories and files from a new version of SuperAdmin to your server
+- restore your backup file `/databases/applications.json`
+- restore your credentials in `/config`
+- youv have to update `SSL generator` to latest version via `bash /www/superadmin/ssl.sh --update`
+- restart SuperAdmin `bash run.sh`
+- clear cache in your web browser
 
 ## Nice to know
 
