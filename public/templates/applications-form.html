@@ -1,4 +1,4 @@
-<div data-component="form" data-title="@(Edit application)" data-jc-path="common.form" data-if="value === 'applications'" data-width="900px" data-component-id="applications.form" data-autocenter="false">
+<div data-component="form" data-title="@(Edit application)" data-jc-path="common.form" data-if="value === 'applications'" data-width="900px" data-component-id="applications.form" data-autocenter="false" class="hidden">
 	<div class="padding">
 
 		<div data-component="visible" data-jc-path="applications.form.id" data-if="!value" class="hidden">
@@ -119,7 +119,7 @@
 			</div>
 			<div class="col-md-6 m">
 				<div data-jc="textbox" data-jc-path="applications.form.startscript" data-maxlength="50" data-placeholder="index.js" data-icon="fa-hourglass-start">@(Custom start script)</div>
-				<div class="help">@(We do not recommend to use a custom start script. Script can't have name <code>debug.js</code> or <code>release.js</code>.)</div>
+				<div class="help">@(We do not recommend to use a custom start script. Script can't have name <code>debug.js</code> or <code>release.js</code>. <i class="fa fa-lightbulb-o"></i>First argument is a <code>port number</code>.)</div>
 			</div>
 		</div>
 	</div>
