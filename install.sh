@@ -60,7 +60,6 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
     mkdir /www/node_modules/
     cd /www/
-    npm install -g bower
     npm install -g gulp
     npm install total.js@beta
 
