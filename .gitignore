@@ -3,3 +3,5 @@ superadmin.log
 databases/applications.json
 debug.pid
 tmp/
+/nbproject
+/node_modules

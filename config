@@ -1,10 +1,10 @@
-name                      : MyServer
-version                   : 5.0.0
-author                    : Totaljs.com Ltd
+name                      : TM-manager
+version                   : 5.0.1
+author                    : ToManage
 cookie                    : __sa
 
 superadmin                : admin:admin
-superadmin-templates      : https://modules.totaljs.com/superadmin.json
+superadmin-templates      : http://modules.tomanage.fr/manager.json
 
 // Custom SMTP settings
 mail.smtp                 : YOUR.SMTPSERVER.COM

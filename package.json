@@ -1,7 +1,7 @@
 {
-  "name": "SuperAdmin",
-  "description": "SuperAdmin can manage your Linux server for you. It creates NGINX conf files for your apps build on Total.js framework and runs them for you.",
-  "version": "5.0.0",
+  "name": "TM-Manager",
+  "description": "TM-Manager can manage your Linux server for you. It creates NGINX conf files for your apps build on Total.js framework and runs them for you.",
+  "version": "5.0.1",
   "dependencies": {
     "total.js": "latest"
   },
@@ -13,8 +13,9 @@
     "server",
     "admin",
     "nginx",
-    "total.js"
+    "total.js",
+    "tomanage"
   ],
-  "author":"Totaljs",
-  "license": "MIT"
+  "author":"ToManage Totaljs",
+  "license": "OSLv3"
 }
