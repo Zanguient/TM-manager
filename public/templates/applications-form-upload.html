@@ -26,6 +26,11 @@
 			<div data-jc="checkbox" data-jc-path="applications.upload.npm" class="inline mr5">@(Performs NPM install)</div>
 			<div class="inline middle"><span class="badge badge-blue">package.json</span></div>
 		</div>
+                <div data-jc="visible" data-jc-path="applications.upload.mongoDB" class="hidden">
+                        <div data-jc="textbox" data-jc-path="applications.form.mongo" data-required="true" data-placeholder="@(mongoDB server mongodb://127.0.0.1/mydatabase)">@(MongoDB url)</div>
+			<div data-jc="checkbox" data-jc-path="applications.upload.mongo" class="inline mr5">@(Install Mongo dump)</div>
+			<div class="inline middle"><span class="badge badge-green">mongorestore</span></div>
+		</div>
 		<div data-jc="checkbox" class="b red" data-jc-path="applications.upload.remove">@(Removes all files in application directory)</div>
 		<div class="help">@(When is this option checked then SuperAdmin removes all <i class="fa fa-trash nmr"></i> files before unpacking package.)</div>
 	</div>
@@ -47,7 +52,7 @@
 	function applications_upload_refresh() {
 		var id = applications.id;
 		FIND('#applications.package').custom(id);
-		SET('applications.upload', { id: id, filename: '', remove: false, name: applications.grid.findItem('id', id).url });
+		SET('applications.upload', { id: id, filename: '', remove: false, name: applications.grid.findItem('id', id).url }, mongoDB: applications.grid.findItem('id', id).mongoDB);
 		AJAXCACHE('GET /api/templates/', null, 'applications.templates', '3 minutes');
 	}
 
