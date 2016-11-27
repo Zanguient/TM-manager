@@ -52,7 +52,7 @@
 	function applications_upload_refresh() {
 		var id = applications.id;
 		FIND('#applications.package').custom(id);
-		SET('applications.upload', { id: id, filename: '', remove: false, name: applications.grid.findItem('id', id).url }, mongoDB: applications.grid.findItem('id', id).mongoDB);
+		SET('applications.upload', { id: id, filename: '', remove: false, name: applications.grid.findItem('id', id).url, mongoDB: applications.grid.findItem('id', id).mongoDB});
 		AJAXCACHE('GET /api/templates/', null, 'applications.templates', '3 minutes');
 	}
 
