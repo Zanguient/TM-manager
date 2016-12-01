@@ -4,7 +4,7 @@ author                    : ToManage
 cookie                    : __sa
 
 superadmin                : admin:admin
-superadmin-templates      : http://modules.tomanage.fr/manager.json
+superadmin-templates      : https://modules.tomanage.fr/manager.json
 
 // Custom SMTP settings
 mail.smtp                 : YOUR.SMTPSERVER.COM
