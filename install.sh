@@ -7,6 +7,7 @@ echo "you wil be prompted to provide both."
 echo "By default, a cer-key pair is generated using OpenSSL for HTTPS, if HTTPS is enabled"
 echo "You can find the cer-key pair in the /etc/ssl/<domain>/ folder."
 echo "You will be promted to enter details for the certificate"
+echo "TM-Manager uses these commands: lsof, ps, netstat, du, cat, free, df, tail, last, ifconfig, uptime, tar"
 
 # Root check
 if [[ $EUID -ne 0 ]]; then
@@ -15,23 +16,23 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 #User Consent
-printf "${RED}This setup requires the installation of the nginx, nodejs and graphicsmagick packages using apt-get!${NC}\n"
+printf "${RED}This setup requires the installation of the Nginx, Node.js and GraphicsMagick packages using apt-get!${NC}\n"
 read -p "Do you wish to permit this ? (y/n) : " userConsent
 
 if [ "$userConsent" == "y" ]; then
-    read -p "HTTP ? (y/n) : " httpEn
-    read -p "HTTPS ? (y/n) : " httpsEn
+    read -p "Do you want to provide TM-Manager via HTTP? (y/n) : " httpEn
+    read -p "Do you want to provide TM-Manager via HTTPS? (y/n) : " httpsEn
 
     #User Input
     read -p "Domain without protocol (e.g. domain.tk): " domain
     read -p "Subdomain without protocol (e.g. manager): " subdomain
 
     if [ "$httpsEn" == "y" ]; then
-        read -p "Country Name (2 letter code) (eg, IN): " certC
-        read -p "State or Province Name (eg, Kerala): " certST
-        read -p "Locality Name (eg, Kochi): " certL
-        read -p "Organization Name (eg, Novocorp Industries Inc): " certO
-        read -p "Organizational Unit Name (RnD): " certOU
+        read -p "Country Name (2 letter code) (e.g. IN): " certC
+        read -p "State or Province Name (e.g. Kerala): " certST
+        read -p "Locality Name (e.g. Kochi): " certL
+        read -p "Organization Name (e.g. Novocorp Industries Inc): " certO
+        read -p "Organizational Unit Name (e.g. IT department): " certOU
     fi
 
     #Prerequisits
@@ -40,7 +41,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y cron curl
     apt-get install -y python-software-properties
     apt-get install -y software-properties-common
-    curl -sL https://deb.nodesource.com/setup_4.x | bash -
+    curl -sL https://deb.nodesource.com/setup_6.x | bash -
     echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
     apt-get update
     apt-get install -y nginx
@@ -59,8 +60,7 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
     mkdir /www/node_modules/
     cd /www/
-    npm install -g gulp
-    npm install total.js@beta
+    npm install total.js
 
     #Key Generation
 
