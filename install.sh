@@ -43,11 +43,13 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y software-properties-common
     curl -sL https://deb.nodesource.com/setup_6.x | bash -
     echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+    add-apt-repository ppa:chris-lea/redis-server
     apt-get update
     apt-get install -y nginx
     apt-get install -y nodejs
     apt-get install -y graphicsmagick
     apt-get install -y mongodb-org
+    apt-get install -y redis-server
     apt-get install -y texlive-latex-base
     apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
     apt-get upgrade -y
