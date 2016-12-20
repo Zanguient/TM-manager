@@ -46,7 +46,7 @@
 
 	<div data-jc="error" data-jc-path="applications.upload.response"></div>
 	<div class="ui-form-buttons">
-		<div data-jc="validation" data-jc-path="applications.upload" data-if="((applications.upload.filename || applications.upload.template) && !(applications.upload.db ^ Boolean(applications.upload.database))) ? true : false">
+		<div data-jc="validation" data-jc-path="applications.upload" data-if="(applications.upload.filename || applications.upload.template) ? true : false">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -73,7 +73,7 @@
                             SET('applications.upload.database',"mongodb://127.0.0.1/mydatabase");
                         } else {
                             SET('applications.upload.db', false);
-                            SET('applications.upload.database', null);
+                            SET('applications.upload.database', "");
                         }
                     
 			SET('applications.upload.remove', false);
