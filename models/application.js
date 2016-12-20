@@ -239,14 +239,14 @@ NEWSCHEMA('Application').make(function(schema) {
         
                             switch (name) {
                                 case 'database' :
-                                    lines[i] = "database		  : " + model.database;
+                                    lines[i] = "database		  : " + item.database;
                                     break;
                                 case 'manager-superadmin' :
                                     lines[i] = "manager-superadmin	  : " + CONFIG('superadmin');
                                     break;
                                 case 'name':
-                                    if(model.name)
-                                        lines[i] = "name            	  : " + model.name;
+                                    if(item.name)
+                                        lines[i] = "name            	  : " + item.name;
                                     break;
                             }
                     }
