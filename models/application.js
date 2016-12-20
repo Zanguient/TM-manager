@@ -181,8 +181,11 @@ NEWSCHEMA('Application').make(function(schema) {
 	});
         
         schema.addWorkflow('config', function(error, model, id, callback) {
-                var item = APPLICATIONS.findItem('id', id);
-                if(model)
+                var item;
+                
+                if(id)
+                    item = APPLICATIONS.findItem('id', id);
+                else
                     item = model;
                 
 		if (!item) {
