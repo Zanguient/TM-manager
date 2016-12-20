@@ -29,6 +29,8 @@ NEWSCHEMA('Application').make(function(schema) {
 	schema.define('subprocess',     Boolean);
 	schema.define('npm',            Boolean);                  // Performs NPM install
 	schema.define('renew',          Boolean);                  // Performs renew
+        schema.define('database',       'String(200)');
+        schema.define('name',           'String(200)');             // Name application in config file
 
 	schema.setQuery(function(error, options, callback) {
 		callback(APPLICATIONS);
@@ -149,6 +151,114 @@ NEWSCHEMA('Application').make(function(schema) {
 			model.$repository('restart', true);
 			callback(SUCCESS(true));
 		});
+	});
+        
+        // Upgrade a git repository git pull
+	schema.addWorkflow('upgrade', function(error, model, id, callback) {
+                var item = APPLICATIONS.findItem('id', id);
+		if (!item) {
+			error.push('error-app-404');
+			return callback();
+		}
+            
+                var Git = require("nodegit");
+                var directory = Path.join(CONFIG('directory-www'), item.linker);
+                var repository;
+                
+		// Open a repository that needs to be fetched and fast-forwarded
+                Git.Repository.open(directory)
+                .then(function(repo) {
+                    repository = repo;
+
+                    return repository;
+                })
+                // Now that we're finished fetching, go ahead and merge our local branch
+                // with the new one
+                .then(function() {
+                    return repository.mergeBranches("master", "origin/master");
+                })
+                .done(callback);
+	});
+        
+        schema.addWorkflow('config', function(error, model, id, callback) {
+                var item = APPLICATIONS.findItem('id', id);
+                if(model)
+                    item = model;
+                
+		if (!item) {
+			error.push('error-app-404');
+			return callback();
+		}
+                
+                var filename = Path.join(CONFIG('directory-www'), item.linker, 'config');
+                
+                // copy default config file
+                if (!Fs.existsSync(filename)) {
+                    Fs.createReadStream(filename + '.sample').pipe(Fs.createWriteStream(filename));
+                }
+                
+                // modify config file for database and useradmin
+                Fs.readFile(filename, 'utf8', function (err,data) {
+                    if (err) {
+                        error.push('template', err);
+                        console.log(err);
+                        return callback();
+                    }
+                    
+                    var lines = data.split('\n');
+                    var subtype;
+                    var value;
+                    var obj = {};
+                    var result;
+
+                    for (var i = 0, len = lines.length; i < len; i++) {
+                        var str = lines[i];
+
+                        if (!str || str[0] === '#' || (str[0] === '/' || str[1] === '/'))
+                            continue;
+
+                        var index = str.indexOf(':');
+                            if (index === -1)
+                                continue;
+
+                        var name = str.substring(0, index).trim();
+                        if (name === 'debug' || name === 'resources')
+                            continue;
+
+                        value = str.substring(index + 1).trim();
+                        index = name.indexOf('(');
+
+                        if (index !== -1) {
+                            subtype = name.substring(index + 1, name.indexOf(')')).trim().toLowerCase();
+                            name = name.substring(0, index).trim();
+                        } else
+                            subtype = '';
+        
+                            switch (name) {
+                                case 'database' :
+                                    lines[i] = "database		  : " + model.database;
+                                    break;
+                                case 'manager-superadmin' :
+                                    lines[i] = "manager-superadmin	  : " + CONFIG('superadmin');
+                                    break;
+                                case 'name':
+                                    if(model.name)
+                                        lines[i] = "name            	  : " + model.name;
+                                    break;
+                            }
+                    }
+    
+                    result = lines.join("\n");
+
+                    Fs.writeFile(filename, result, 'utf8', function (err) {
+                        if (err) {
+                            error.push('template', err);
+                            console.log(err);
+                            return callback();
+                        }
+                        callback();
+                    });
+                });
 	});
 
 	schema.setRemove(function(error, id, callback) {

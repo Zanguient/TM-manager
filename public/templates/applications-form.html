@@ -122,6 +122,16 @@
 				<div class="help">@(We do not recommend to use a custom start script. App directory can't contain these files <code>debug.js</code> and <code>release.js</code>. <i class="fa fa-lightbulb-o"></i>First argument is a <code>port number</code>.)</div>
 			</div>
 		</div>
+                <div class="row">
+                        <div class="col-md-6 m">
+				<div data-jc="textbox" data-jc-path="applications.form.name" data-maxlength="200" data-placeholder="Application NAME" data-icon="fa-home">@(Application NAME)</div>
+				<div class="help">@(We recommend to use a specific application name for SEO.)</div>
+			</div>
+                        <div data-jc="visible" data-jc-path="applications.form.database" class="hidden col-md-6 m">
+				<div data-jc="textbox" data-jc-path="applications.form.database" data-maxlength="200" data-placeholder="@(mongodb://127.0.0.1/mydatabase)" data-icon="fa-database">@(URL for application database)</div>
+				<div class="help">@(If you use <b>mongoDB</b> then it had it in config file.)</div>
+			</div>
+		</div>
 	</div>
 	<hr />
 	<div class="padding">

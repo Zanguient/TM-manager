@@ -3,6 +3,8 @@
   "description": "TM-Manager can manage your Linux server for you. It creates NGINX conf files for your apps build on Total.js framework and runs them for you.",
   "version": "5.0.1",
   "dependencies": {
+    "async": "^2.1.4",
+    "nodegit": "^0.16.0",
     "total.js": "latest"
   },
   "scripts": {
@@ -16,6 +18,6 @@
     "total.js",
     "tomanage"
   ],
-  "author":"ToManage Totaljs",
+  "author": "ToManage Totaljs",
   "license": "OSLv3"
 }

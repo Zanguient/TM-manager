@@ -9,6 +9,7 @@ NEWSCHEMA('Package').make(function(schema) {
 	schema.define('template', 'String(500)');
 	schema.define('remove', Boolean);
 	schema.define('npm', Boolean);
+        schema.define('database', 'String(200)');
 
 	schema.addWorkflow('check', function(error, model, options, callback) {
 
@@ -22,9 +23,16 @@ NEWSCHEMA('Package').make(function(schema) {
 		model.appdirectory = Path.join(CONFIG('directory-www'), model.applinker);
 		model.appfilename = Path.join(model.appdirectory, app.id + '.package');
 		model.app = app;
+                
+                app.database = model.database;
+                SuperAdmin.save();
 
 		if (!model.template)
-			return callback();
+                    return callback();
+                
+                //is a git repository
+                if (model.template.endsWith(".git"))
+                    return callback(SUCCESS(true));
 
 		U.download(model.template, ['get', 'dnscache'], function(err, response) {
 
@@ -61,26 +69,80 @@ NEWSCHEMA('Package').make(function(schema) {
 
 		if (!model.remove)
 			return callback();
+                    
+                var async = require('async');
+
+                function removeFolder(location, next) {
+                    Fs.readdir(location, function (err, files) {
+                        async.each(files, function (file, cb) {
+                            file = location + '/' + file
+                            Fs.stat(file, function (err, stat) {
+                                if (err) 
+                                    return cb(err);
+                        
+                                if (stat.isDirectory()) 
+                                    removeFolder(file, cb);
+                                else 
+                                    Fs.unlink(file, cb);
+                            });
+                        }, function (err) {
+                            if (err) return next(err);
+                            Fs.rmdir(location, function (err) {
+                                return next(err);
+                            });
+                        });
+                    });
+                }
+
 
 		U.ls(model.appdirectory, function(files, directories) {
 
 			// package
 			files = files.remove(model.appfilename);
 
+                        
+
 			// Removes Files
 			F.unlink(files, function() {
 				directories.wait(function(item, next) {
-					Fs.rmdir(item, () => next());
+                                        //console.log(item);
+                                        //
+                                        //
+					//Fs.rmdir(item, () => next());
+                                        removeFolder(item, () => next());
 				}, () => callback());
 			});
 		});
 	});
-
+        
 	schema.addWorkflow('unpack', function(error, model, options, callback) {
 
 		var linker = model.app.linker;
 		var directory = Path.join(CONFIG('directory-www'), linker);
 		var filename = Path.join(directory, model.app.id + '.package');
+                
+                //console.log(model);
+                
+                //is a git repository
+                if(model.template.endsWith(".git")) {
+                    var Git = require("nodegit");
+                    
+                    if(model.remove)
+                        
+                    
+                    // Clone a given repository into the `./tmp` folder.
+                    return Git.Clone(model.template, directory)
+                    // Look up this known commit.
+                    .then(function(repo) {
+                        return callback(SUCCESS(true));
+                    })
+                    .catch(function(err) { 
+                        console.log(err); 
+                        error.push('template', err || '@error-template');
+                        return callback();
+                    });
+                }
+                
 
 		F.restore(filename, directory, function(err) {
 
@@ -94,6 +156,82 @@ NEWSCHEMA('Package').make(function(schema) {
 			F.unlink([filename], F.error());
 			callback(SUCCESS(true));
 		});
+	});
+        
+        schema.addWorkflow('config', function(error, model, options, callback) {
+                var linker = model.app.linker;
+		var filename = Path.join(CONFIG('directory-www'), linker, 'config');
+                
+                // copy default config file
+                if (!Fs.existsSync(filename)) {
+                    Fs.createReadStream(filename + '.sample').pipe(Fs.createWriteStream(filename));
+                }
+                
+                // modify config file for database and useradmin
+                Fs.readFile(filename, 'utf8', function (err,data) {
+                    if (err) {
+                        error.push('template', err);
+                        console.log(err);
+                        return callback();
+                    }
+                    
+                    var lines = data.split('\n');
+                    var subtype;
+                    var value;
+                    var obj = {};
+                    var result;
+
+                    for (var i = 0, len = lines.length; i < len; i++) {
+                        var str = lines[i];
+
+                        if (!str || str[0] === '#' || (str[0] === '/' || str[1] === '/'))
+                            continue;
+
+                        var index = str.indexOf(':');
+                            if (index === -1)
+                                continue;
+
+                        var name = str.substring(0, index).trim();
+                        if (name === 'debug' || name === 'resources')
+                            continue;
+
+                        value = str.substring(index + 1).trim();
+                        index = name.indexOf('(');
+
+                        if (index !== -1) {
+                            subtype = name.substring(index + 1, name.indexOf(')')).trim().toLowerCase();
+                            name = name.substring(0, index).trim();
+                        } else
+                            subtype = '';
+        
+                        var keys = Object.keys(found);
+                        for (var i = 0, length = keys.length; i < length; i++) {
+                            switch (name) {
+                                case 'database' :
+                                    lines[i] = "database		  : " + model.database;
+                                    break;
+                                case 'manager-superadmin' :
+                                    lines[i] = "manager-superadmin	  : " + CONFIG('manager-superadmin');
+                                    break;
+                                case 'name':
+                                    if(model.name)
+                                        lines[i] = "name            	  : " + model.name;
+                                    break;
+                            }
+                        }
+                    }
+    
+                    result = lines.join("\n");
+
+                    Fs.writeFile(filename, result, 'utf8', function (err) {
+                        if (err) {
+                            error.push('template', err);
+                            console.log(err);
+                            return callback();
+                        }
+                        callback();
+                    });
+                });
 	});
 });
 

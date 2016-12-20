@@ -69,6 +69,7 @@
 							<button class="application-button" name="restart" title="@(Restart)"><i class="fa fa-refresh"></i></button>
 							<button class="application-button" name="stop" title="@(Stop)"><i class="fa fa-stop-circle"></i></button>
 							<button class="application-button" name="upload" title="@(Upload package)"><i class="fa fa-cloud-upload"></i></button>
+                                                        <button class="application-button" name="upgrade" title="@(Upgrade application)"><i class="fa fa-repeat"></i></button>
 							<button class="application-button" name="settings" title="@(Settings)"><i class="fa fa-cog"></i></button>
 							<button class="application-button" name="download" title="@(Backup as package)"><i class="fa fa-cloud-download"></i></button>
 							<button class="application-button" name="remove" title="@(Remove)"><i class="fa fa-times-circle"></i></button>
@@ -534,6 +535,14 @@
 				return;
 			case 'settings':
 				applications_edit(id, -1);
+				return;
+                        case 'upgrade' :
+                                SETTER('loading', 'show');
+				AJAX('GET /api/apps/{0}/upgrade/'.format(id), function(response) {
+					applications_info();
+					button.closest('tr').removeClass('error');
+					success();
+				});
 				return;
 		}
 	});

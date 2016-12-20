@@ -6,11 +6,20 @@
 	<hr />
 	<div class="padding npt">
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-6 m">
 				<div data-jc="dropdown" data-jc-id="applications.template" data-jc-path="applications.upload.template" data-icon="fa fa-globe" data-source="applications.templates" data-source-value="url" data-empty="">@(Select template)</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-6 m">
 				<div data-jc="fileupload" data-jc-id="applications.package" data-jc-path="applications.upload.filename" data-icon="fa fa-search" data-placeholder="myapplication.package" data-url="/api/apps/upload/" data-singlefile="true">@(Browse device)</div>
+			</div>
+		</div>
+                <div class="row">
+			<div class="col-md-6 m">
+                            <div data-jc="textbox" data-jc-path="applications.upload.template" data-maxlength="200" data-placeholder="https url git" data-icon="fa-github">@(URL Git repository)</div>
+                            <div class="help">@(Only work with https)</div>
+			</div>
+			<div class="col-md-6 m">
+				
 			</div>
 		</div>
 		<div data-jc="template" data-jc-path="applications.upload">
@@ -26,10 +35,10 @@
 			<div data-jc="checkbox" data-jc-path="applications.upload.npm" class="inline mr5">@(Performs NPM install)</div>
 			<div class="inline middle"><span class="badge badge-blue">package.json</span></div>
 		</div>
-                <div data-jc="visible" data-jc-path="applications.upload.mongo" class="hidden">
-                        <div data-jc="textbox" data-jc-path="applications.upload.mongoSrv" data-required="true" data-placeholder="@(mongodb://127.0.0.1/mydatabase)">@(MongoDB url)</div>
-			<div data-jc="checkbox" data-jc-path="applications.upload.mongoDump" class="inline mr5">@(Install Mongo dump)</div>
-			<div class="inline middle"><span class="badge badge-green">mongorestore</span></div>
+                <div data-jc="visible" data-jc-path="applications.upload.db" class="hidden">
+                        <div data-jc="textbox" data-jc-path="applications.upload.database" data-required="true" data-placeholder="@(mongodb://127.0.0.1/mydatabase)">@(MongoDB url)</div>
+			<!--<div data-jc="checkbox" data-jc-path="applications.upload.mongoDump" class="inline mr5">@(Install Mongo dump)</div>
+			<div class="inline middle"><span class="badge badge-green">mongorestore</span></div>-->
 		</div>
 		<div data-jc="checkbox" class="b red" data-jc-path="applications.upload.remove">@(Removes all files in application directory)</div>
 		<div class="help">@(When is this option checked then SuperAdmin removes all <i class="fa fa-trash nmr"></i> files before unpacking package.)</div>
@@ -37,7 +46,7 @@
 
 	<div data-jc="error" data-jc-path="applications.upload.response"></div>
 	<div class="ui-form-buttons">
-		<div data-jc="validation" data-jc-path="applications.upload" data-if="((applications.upload.filename || applications.upload.template) && !(applications.upload.mongo ^ Boolean(applications.upload.mongoSrv))) ? true : false">
+		<div data-jc="validation" data-jc-path="applications.upload" data-if="((applications.upload.filename || applications.upload.template) && !(applications.upload.db ^ Boolean(applications.upload.database))) ? true : false">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -61,11 +70,11 @@
 		if (value) {
                         var app = applications.templates.findItem('url', value);
                         if(app.mongoDB) {
-                            SET('applications.upload.mongo', true);
-                            SET('applications.upload.mongoSrv',"mongodb://127.0.0.1/mydatabase");
+                            SET('applications.upload.db', true);
+                            SET('applications.upload.database',"mongodb://127.0.0.1/mydatabase");
                         } else {
-                            SET('applications.upload.mongo', false);
-                            SET('applications.upload.mongoSrv', false);
+                            SET('applications.upload.db', false);
+                            SET('applications.upload.database', null);
                         }
                     
 			SET('applications.upload.remove', false);

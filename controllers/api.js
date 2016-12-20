@@ -10,6 +10,7 @@ exports.install = function() {
 	F.route('/api/apps/{id}/',         json_read,             ['authorize', '*Application']);
 	F.route('/api/apps/{id}/restart/', json_apps_restart,     ['authorize', '*Application', 20000]);
 	F.route('/api/apps/{id}/stop/',    json_apps_stop,        ['authorize', '*Application', 20000]);
+        F.route('/api/apps/{id}/upgrade/', json_apps_upgrade,     ['authorize', '*Application', 20000]);
 	F.route('/api/apps/{id}/remove/',  json_apps_remove,      ['authorize', 'delete', '*Application', 20000]);
 	F.route('/api/apps/{id}/pack/',    file_apps_pack,        ['authorize', '*Application']);
 	F.route('/api/apps/restart/',      json_apps_restart,     ['authorize', '*Application', 50000]);
@@ -53,7 +54,7 @@ function json_query() {
 function json_apps_save() {
 	var self = this;
 	SuperAdmin.logger('save: {0}', self, self.body.id);
-	self.$async(self.callback(), 2).$workflow('check').$workflow('port').$save().$workflow('directory').$workflow('nginx');
+	self.$async(self.callback(), 2).$workflow('check').$workflow('port').$save().$workflow('directory').$workflow('config').$workflow('nginx');
 }
 
 function json_apps_info() {
@@ -144,6 +145,28 @@ function json_apps_stop(id) {
 	}
 }
 
+function json_apps_upgrade(id) {
+	var self = this;
+         
+	var app = APPLICATIONS.find('id', id);
+	if (!app)
+		return self.invalid().push('error-app-404');
+
+	SuperAdmin.logger('uograde: {0}', self, app);
+    
+        self.$workflow('upgrade', id).$workflow('config',id, function(err, response) {
+		if (err)
+                    self.invalid().push(err);
+		else
+                    SuperAdmin.restart(app.port, (err) => self.json(SUCCESS(true, err)));
+	});
+
+	if (!app.stopped) {
+		app.stopped = true;
+		SuperAdmin.save(NOOP);
+	}
+}
+
 function json_apps_logs(id) {
 	var self = this;
 	SuperAdmin.logger('logs: {0}', self, id);
@@ -209,8 +232,9 @@ function json_apps_upload(argument) {
 
 function json_apps_unpack() {
 	var self = this;
-	SuperAdmin.logger('restore: {0}', self, self.body.id);
-	self.$async(self.callback(), 4).$workflow('check').$workflow('stop').$workflow('remove').$workflow('unpack').$workflow('restart');
+        
+	SuperAdmin.logger('unpack: {0}', self, self.body.id);
+	self.$async(self.callback(), 4).$workflow('check').$workflow('stop').$workflow('remove').$workflow('unpack').$workflow('config').$workflow('restart');
 }
 
 function file_apps_pack(id) {
