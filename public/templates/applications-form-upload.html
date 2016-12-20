@@ -63,13 +63,12 @@
 		FIND('#applications.package').custom(id);
 		SET('applications.upload', { id: id, filename: '', remove: false, name: applications.grid.findItem('id', id).url, mongoDB: applications.grid.findItem('id', id).mongoDB});
 		AJAXCACHE('GET /api/templates/', null, 'applications.templates', '3 minutes');
-                console.log(applications);
 	}
 
 	WATCH('applications.upload.template', function(path, value) {
 		if (value) {
                         var app = applications.templates.findItem('url', value);
-                        if(app.mongoDB) {
+                        if(app && app.mongoDB) {
                             SET('applications.upload.db', true);
                             SET('applications.upload.database',"mongodb://127.0.0.1/mydatabase");
                         } else {
