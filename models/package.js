@@ -204,8 +204,6 @@ NEWSCHEMA('Package').make(function(schema) {
                         } else
                             subtype = '';
         
-                        var keys = Object.keys(found);
-                        for (var i = 0, length = keys.length; i < length; i++) {
                             switch (name) {
                                 case 'database' :
                                     lines[i] = "database		  : " + model.database;
@@ -217,7 +215,7 @@ NEWSCHEMA('Package').make(function(schema) {
                                     if(model.name)
                                         lines[i] = "name            	  : " + model.name;
                                     break;
-                            }
+                            
                         }
                     }
     
