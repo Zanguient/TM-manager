@@ -193,7 +193,12 @@ NEWSCHEMA('Application').make(function(schema) {
                                 return repository.fetchAll({
                                     callbacks: {
                                         credentials: function(url, userName) {
-                                            return Git.Cred.sshKeyFromAgent(userName);
+                                            return Git.Cred.sshKeyNew(
+                                                    userName,
+                                                    '/root/.ssh/id_rsa.pub',
+                                                    '/root/.ssh/id_rsa',
+                                                    "" //Passphrase
+                                            );
                                         },
                                         certificateCheck: function() {
                                             return 1;
