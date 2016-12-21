@@ -214,7 +214,7 @@ NEWSCHEMA('Application').make(function(schema) {
                             .done(function(){
                                 // INSTALL MODULE
                                 var module = directory.replace(Path.join(directory,'install'),'');
-                                module = path.substring(1); // remove first '/'
+                                module = module.substring(1); // remove first '/'
                                 
                                 SuperAdmin.gulpinstall(item, module ,() => next());
                             });
