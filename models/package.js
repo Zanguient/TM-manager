@@ -10,6 +10,7 @@ NEWSCHEMA('Package').make(function(schema) {
 	schema.define('remove', Boolean);
 	schema.define('npm', Boolean);
         schema.define('database', 'String(200)');
+        schema.define('module', 'String(200)'); // Url git for module
 
 	schema.addWorkflow('check', function(error, model, options, callback) {
 
@@ -156,6 +157,68 @@ NEWSCHEMA('Package').make(function(schema) {
 			F.unlink([filename], F.error());
 			callback(SUCCESS(true));
 		});
+	});
+        
+        // Install module in install directory
+        schema.addWorkflow('module', function(error, model, options, callback) {
+
+		var linker = model.app.linker;
+		var directory = Path.join(CONFIG('directory-www'), linker, 'install');
+                
+                var moduleUrl = model.module.split('/');
+                var module = moduleUrl.last().replace('.git','');
+                
+                Fs.stat(Path.join(directory, module), function(err, data){
+                    if(!err) {
+                        error.push('template', 'Module already installed');
+                        return callback();
+                    }
+                });
+                
+                
+                //is a git repository
+                if(model.module.endsWith(".git")) {
+                    var Git = require("nodegit");
+                    
+                    // Clone a given repository into the `/install` folder.
+                    return Git.Clone(model.module, Path.join(directory, module),{
+                        fetchOpts : {
+                                    callbacks: {
+                                        credentials: function(url, userName) {
+                                            return Git.Cred.sshKeyNew(
+                                                    userName,
+                                                    '/root/.ssh/id_rsa.pub',
+                                                    '/root/.ssh/id_rsa',
+                                                    "artalys" //Passphrase
+                                            );
+                                        },
+                                        certificateCheck: function() {
+                                            return 1;
+                                        }
+                                    }
+                                }
+                    })
+                    // Look up this known commit.
+                    .then(function(repo) {
+                        SuperAdmin.gulpinstall(model.app, module ,function(err){
+                            if(err) {
+                                error.push('template', err);
+                                return callback();
+                            }
+                            
+                            callback(SUCCESS(true));
+                        });
+                        return;
+                    })
+                    .catch(function(err) { 
+                        console.log(err); 
+                        error.push('template', err || '@error-template');
+                        return callback();
+                    });
+                }
+                
+                error.push('template', 'not a git repository');
+                return callback();
 	});
         
         schema.addWorkflow('config', function(error, model, options, callback) {

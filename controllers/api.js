@@ -234,6 +234,9 @@ function json_apps_unpack() {
 	var self = this;
         
 	SuperAdmin.logger('unpack: {0}', self, self.body.id);
+        if(self.body.module)
+            return self.$async(self.callback(), 4).$workflow('check').$workflow('stop').$workflow('module').$workflow('restart');
+            
 	self.$async(self.callback(), 4).$workflow('check').$workflow('stop').$workflow('remove').$workflow('unpack').$workflow('config').$workflow('restart');
 }
 

@@ -13,16 +13,7 @@
 				<div data-jc="fileupload" data-jc-id="applications.package" data-jc-path="applications.upload.filename" data-icon="fa fa-search" data-placeholder="myapplication.package" data-url="/api/apps/upload/" data-singlefile="true">@(Browse device)</div>
 			</div>
 		</div>
-                <div class="row">
-			<div class="col-md-6 m">
-                            <div data-jc="textbox" data-jc-path="applications.upload.template" data-maxlength="200" data-placeholder="https url git" data-icon="fa-github">@(URL Git repository)</div>
-                            <div class="help">@(Only work with https)</div>
-			</div>
-			<div class="col-md-6 m">
-				
-			</div>
-		</div>
-		<div data-jc="template" data-jc-path="applications.upload">
+                <div data-jc="template" data-jc-path="applications.upload">
 			<script type="text/html">
 				{{ if filename }}
 				<div class="fs11 mt10"><i class="fa fa-file mr5"></i><b>@(Filename:)</b> {{ filename }}</div>
@@ -30,7 +21,22 @@
 				{{ fi }}
 			</script>
 		</div>
-		<br />
+        </div>
+        <div class="padding bg-smoke npb">
+            <h2><i class="fa fa-github"></i>Install application or module from Git</h2>
+            <div class="row">
+                <div class="col-md-6 m">
+                    <div data-jc="textbox" data-jc-path="applications.upload.template" data-maxlength="200" data-placeholder="https://myapp/repo.git " data-icon="fa-github">@(URL Git repository <b>application</b>)</div>
+                    <div class="help">@(Only work with https)</div>
+                </div>
+                <div class="col-md-6 m">
+                    <div data-jc="textbox" data-jc-path="applications.upload.module" data-maxlength="200" data-placeholder="git@mymodule/repo.git" data-icon="fa-github">@(URL Git repository <b>module</b>)</div>
+                    <div class="help">@(Require a valid SSH key to install modules. Install it in <code>/install</code>)</div>
+                </div> 
+            </div>
+        </div>
+        <br />
+        <div class="padding npt">
 		<div>
 			<div data-jc="checkbox" data-jc-path="applications.upload.npm" class="inline mr5">@(Performs NPM install)</div>
 			<div class="inline middle"><span class="badge badge-blue">package.json</span></div>
@@ -46,7 +52,7 @@
 
 	<div data-jc="error" data-jc-path="applications.upload.response"></div>
 	<div class="ui-form-buttons">
-		<div data-jc="validation" data-jc-path="applications.upload" data-if="applications.upload.filename || applications.upload.template">
+		<div data-jc="validation" data-jc-path="applications.upload" data-if="applications.upload.filename || applications.upload.template || applications.upload.module">
 			<button name="submit">@(SUBMIT)</button>
 		</div>
 		<button name="cancel">@(Cancel)</button>
@@ -55,7 +61,15 @@
 
 <script>
 
-	applications.upload = {};
+	applications.upload = {
+            template : '',
+            module: '',
+            filename : '',
+            db : false,
+            database : false,
+            remove : false,
+            npm : false
+        };
 	applications.templates = EMPTYARRAY;
 
 	function applications_upload_refresh() {
@@ -76,6 +90,16 @@
                             SET('applications.upload.database', false);
                         }
                     
+			SET('applications.upload.remove', false);
+			SET('applications.upload.npm', false);
+		}
+	});
+        
+        WATCH('applications.upload.module', function(path, value) {
+		if (value) {
+                        SET('applications.upload.template', "");
+                        SET('applications.upload.db', false);
+                        SET('applications.upload.database', false);
 			SET('applications.upload.remove', false);
 			SET('applications.upload.npm', false);
 		}
