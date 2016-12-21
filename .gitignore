@@ -5,3 +5,4 @@ debug.pid
 tmp/
 /nbproject
 /node_modules
+config

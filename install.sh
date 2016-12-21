@@ -79,6 +79,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y git
     git clone https://github.com/ToManage/manager.git
     mv manager /www/
+    cp /www/manager/config.sample /www/manager/config
     cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
     cp /www/manager/nginx.conf /etc/nginx/nginx.conf
     cp /www/manager/manager.conf /www/nginx/
