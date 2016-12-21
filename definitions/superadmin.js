@@ -482,6 +482,11 @@ SuperAdmin.npminstall = function(app, callback) {
 	return SuperAdmin;
 };
 
+SuperAdmin.gulpinstall = function(app, module, callback) {
+	Exec('bash {0} {1}'.format(F.path.databases('gulpnstall.sh'), Path.join(CONFIG('directory-www'), app.linker, 'install', module)), (err) => callback(err));
+	return SuperAdmin;
+};
+
 /**
  * Kills application
  * @param {Number} port

@@ -183,10 +183,10 @@ NEWSCHEMA('Application').make(function(schema) {
                     
                     // UPGRADE MODULES in install directory
                     U.ls(Path.join(directory, 'install'), function(files, directories) {
-			directories.wait(function(item, next) {
+			directories.wait(function(directory, next) {
                             var repository;
                         
-                            Git.Repository.open(item)
+                            Git.Repository.open(directory)
                             .then(function(repo) {
                                 repository = repo;
 
@@ -211,7 +211,13 @@ NEWSCHEMA('Application').make(function(schema) {
                             .then(function() {
                                 return repository.mergeBranches("master", "origin/master");
                             })
-                            .done(() => next());
+                            .done(function(){
+                                // INSTALL MODULE
+                                var module = directory.replace(Path.join(directory,'install'),'');
+                                module = path.substring(1); // remove first '/'
+                                
+                                SuperAdmin.gulpinstall(item, module ,() => next());
+                            });
                                         //console.log(item);
                                         //
                                         //
