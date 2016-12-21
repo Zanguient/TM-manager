@@ -172,7 +172,21 @@ NEWSCHEMA('Application').make(function(schema) {
                 .then(function(repo) {
                     repository = repo;
 
-                    return repository;
+                    return repository.fetchAll({
+                                    callbacks: {
+                                        credentials: function(url, userName) {
+                                            return Git.Cred.sshKeyNew(
+                                                    userName,
+                                                    '/root/.ssh/id_rsa.pub',
+                                                    '/root/.ssh/id_rsa',
+                                                    CONFIG('ssh-passphrase') || "" //Passphrase
+                                            );
+                                        },
+                                        certificateCheck: function() {
+                                            return 1;
+                                        }
+                                    }
+                                });
                 })
                 // Now that we're finished fetching, go ahead and merge our local branch
                 // with the new one
@@ -197,7 +211,7 @@ NEWSCHEMA('Application').make(function(schema) {
                                                     userName,
                                                     '/root/.ssh/id_rsa.pub',
                                                     '/root/.ssh/id_rsa',
-                                                    "" //Passphrase
+                                                    CONFIG('ssh-passphrase') || "" //Passphrase
                                             );
                                         },
                                         certificateCheck: function() {

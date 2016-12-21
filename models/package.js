@@ -132,7 +132,23 @@ NEWSCHEMA('Package').make(function(schema) {
                         
                     
                     // Clone a given repository into the `./tmp` folder.
-                    return Git.Clone(model.template, directory)
+                    return Git.Clone(model.template, directory,{
+                        fetchOpts : {
+                                    callbacks: {
+                                        credentials: function(url, userName) {
+                                            return Git.Cred.sshKeyNew(
+                                                    userName,
+                                                    '/root/.ssh/id_rsa.pub',
+                                                    '/root/.ssh/id_rsa',
+                                                    CONFIG('ssh-passphrase') || "" //Passphrase
+                                            );
+                                        },
+                                        certificateCheck: function() {
+                                            return 1;
+                                        }
+                                    }
+                                }
+                    })
                     // Look up this known commit.
                     .then(function(repo) {
                         return callback(SUCCESS(true));
@@ -189,7 +205,7 @@ NEWSCHEMA('Package').make(function(schema) {
                                                     userName,
                                                     '/root/.ssh/id_rsa.pub',
                                                     '/root/.ssh/id_rsa',
-                                                    "artalys" //Passphrase
+                                                    CONFIG('ssh-passphrase') || "" //Passphrase
                                             );
                                         },
                                         certificateCheck: function() {

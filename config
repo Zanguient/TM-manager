@@ -18,6 +18,8 @@ mail.smtp                 : YOUR.SMTPSERVER.COM
 // mail.smtp                : smtp.office365.com
 // mail.smtp.options        : {"port":587,"secure":false,"user":"ENTER_YOUR_EMAIL","password":"ENTER_YOUR_PASSWORD","tls":{"ciphers":"SSLv3"}}
 
+ssh-passphrase		  : artalys
+
 // Server configuration
 directory-nginx           : /www/nginx/
 directory-ssl             : /www/ssl/
