@@ -41,7 +41,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y cron curl
     apt-get install -y python-software-properties
     apt-get install -y software-properties-common
-    curl -sL https://deb.nodesource.com/setup_6.x | bash -
+    curl -sL https://deb.nodesource.com/setup_4.x | bash -
     echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.2.list
     add-apt-repository ppa:chris-lea/redis-server
     add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -53,7 +53,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y redis-server
     apt-get install -y texlive-latex-base
     apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
-    apt-get install -y libstdc++-4.9-dev libssl-dev
+    apt-get install -y libstdc++-4.9-dev libssl-dev g++
     apt-get upgrade -y
     curl https://get.acme.sh | sh
     mkdir /www/
