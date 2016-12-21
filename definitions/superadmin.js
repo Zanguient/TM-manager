@@ -483,7 +483,7 @@ SuperAdmin.npminstall = function(app, callback) {
 };
 
 SuperAdmin.gulpinstall = function(app, module, callback) {
-	Exec('bash {0} {1}'.format(F.path.databases('gulpnstall.sh'), Path.join(CONFIG('directory-www'), app.linker, 'install', module)), (err) => callback(err));
+	Exec('bash {0} {1}'.format(F.path.databases('gulpinstall.sh'), Path.join(CONFIG('directory-www'), app.linker, 'install', module)), (err) => callback(err));
 	return SuperAdmin;
 };
 
