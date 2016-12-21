@@ -209,7 +209,7 @@ NEWSCHEMA('Package').make(function(schema) {
                                     lines[i] = "database		  : " + model.app.database;
                                     break;
                                 case 'manager-superadmin' :
-                                    lines[i] = "manager-superadmin	  : " + CONFIG('manager-superadmin');
+                                    lines[i] = "manager-superadmin	  : " + CONFIG('superadmin');
                                     break;
                                 case 'name':
                                     if(model.app.name)

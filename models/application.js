@@ -165,6 +165,8 @@ NEWSCHEMA('Application').make(function(schema) {
                 var directory = Path.join(CONFIG('directory-www'), item.linker);
                 var repository;
                 
+                // UPGRADE MAIN REPOSITORY
+                
 		// Open a repository that needs to be fetched and fast-forwarded
                 Git.Repository.open(directory)
                 .then(function(repo) {
@@ -177,7 +179,56 @@ NEWSCHEMA('Application').make(function(schema) {
                 .then(function() {
                     return repository.mergeBranches("master", "origin/master");
                 })
-                .done(callback);
+                .done(function(blob){
+                    
+                    // UPGRADE MODULES in install directory
+                    U.ls(Path.join(directory, 'install'), function(files, directories) {
+			directories.wait(function(item, next) {
+                            var repository;
+                        
+                            Git.Repository.open(item)
+                            .then(function(repo) {
+                                repository = repo;
+
+                                return repository.fetchAll({
+                                    callbacks: {
+                                        credentials: function(url, userName) {
+                                            return Git.Cred.sshKeyFromAgent(userName);
+                                        },
+                                        certificateCheck: function() {
+                                            return 1;
+                                        }
+                                    }
+                                });
+                            })
+                            // Now that we're finished fetching, go ahead and merge our local branch
+                            // with the new one
+                            .then(function() {
+                                return repository.mergeBranches("master", "origin/master");
+                            })
+                            .done(() => next());
+                                        //console.log(item);
+                                        //
+                                        //
+					//Fs.rmdir(item, () => next());
+                                        //removeFolder(item, () => next());
+			}, () => callback());
+                    }, function(path, isDirectory){
+                        // Filter subdirectories
+                        if(!isDirectory)
+                            return false;
+                        
+                        path = path.replace(Path.join(directory,'install'),'');
+                        path = path.substring(1);
+                        
+                        if(path.indexOf("/") >= 0) //subdirectory
+                            return false;
+                        
+                        return true;
+                    });
+                });
+        
+                
 	});
         
         schema.addWorkflow('config', function(error, model, id, callback) {
