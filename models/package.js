@@ -25,8 +25,10 @@ NEWSCHEMA('Package').make(function(schema) {
 		model.appfilename = Path.join(model.appdirectory, app.id + '.package');
 		model.app = app;
                 
-                app.database = model.database;
-                SuperAdmin.save();
+                if (model.database && model.database != 'false') {
+                    app.database = model.database;
+                    SuperAdmin.save();
+                }
 
 		if (!model.template)
                     return callback();
