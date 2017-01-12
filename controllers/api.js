@@ -43,7 +43,7 @@ function json_last() {
 function json_nginx() {
 	var self = this;
 	SuperAdmin.logger('system: Nginx config test', self);
-	Exec('nginx -t', (e, r, m) => self.json(m));
+	Exec('/usr/sbin/nginx -t', (e, r, m) => self.json(m));
 }
 
 function json_query() {
