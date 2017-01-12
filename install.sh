@@ -99,7 +99,9 @@ if [ "$userConsent" == "y" ]; then
     sed -i -e $subrepexp /www/nginx/manager.conf
     service nginx reload
 
-    rm /www/manager/user.guid
+    if [ -f "/www/manager/user.guid" ]; then
+        rm /www/manager/user.guid
+    fi
     read -p "Which user should TM-Manager use to run your applications ? (default root) : " user
     if id "$user" >/dev/null 2>&1; then
         printf "Using user -> %s\n" "$user"
