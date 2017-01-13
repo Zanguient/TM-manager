@@ -64,7 +64,7 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
     mkdir /www/node_modules/
     cd /www/
-    npm install total.js
+    npm install
 
     #Key Generation
 
