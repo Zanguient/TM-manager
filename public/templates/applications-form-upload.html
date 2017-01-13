@@ -81,25 +81,31 @@
 
 	WATCH('applications.upload.template', function(path, value) {
 		if (value) {
-                        var app = applications.templates.findItem('url', value);
-                        if(app && app.mongoDB) {
-                            SET('applications.upload.db', true);
-                            SET('applications.upload.database',"mongodb://127.0.0.1/mydatabase");
-                        } else {
-                            SET('applications.upload.db', false);
-                            SET('applications.upload.database', false);
-                        }
+			var app = applications.templates.findItem('url', value);
+			if (app && app.mongoDB) {
+				SET('applications.upload.module', "");
+				SET('applications.upload.db', true);
+				SET('applications.upload.database',"mongodb://127.0.0.1/mydatabase");
+			} else if (app && app.module) {
+				SET('applications.upload.module', app.url);
+				SET('applications.upload.db', false);
+				SET('applications.upload.database', false);
+			} else {
+				SET('applications.upload.module', "");
+				SET('applications.upload.db', false);
+				SET('applications.upload.database', false);
+			}
                     
 			SET('applications.upload.remove', false);
 			SET('applications.upload.npm', false);
 		}
 	});
-        
-        WATCH('applications.upload.module', function(path, value) {
+	
+	WATCH('applications.upload.module', function(path, value) {
 		if (value) {
-                        SET('applications.upload.template', "");
-                        SET('applications.upload.db', false);
-                        SET('applications.upload.database', false);
+			SET('applications.upload.template', "");
+			SET('applications.upload.db', false);
+			SET('applications.upload.database', false);
 			SET('applications.upload.remove', false);
 			SET('applications.upload.npm', false);
 		}
