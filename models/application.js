@@ -153,24 +153,24 @@ NEWSCHEMA('Application').make(function(schema) {
 		});
 	});
         
-        // Upgrade a git repository git pull
+    // Upgrade a git repository git pull
 	schema.addWorkflow('upgrade', function(error, model, id, callback) {
-                var item = APPLICATIONS.findItem('id', id);
+		var item = APPLICATIONS.findItem('id', id);
 		if (!item) {
 			error.push('error-app-404');
 			return callback();
 		}
-            
-                var Git = require("nodegit");
-                var directory = Path.join(CONFIG('directory-www'), item.linker);
-                var repository;
-                
-                // UPGRADE MAIN REPOSITORY
-                
+		
+		var Git = require("nodegit");
+		var directory = Path.join(CONFIG('directory-www'), item.linker);
+		var repository;
+		
+		// UPGRADE MAIN REPOSITORY
+		
 		// Open a repository that needs to be fetched and fast-forwarded
-                Git.Repository.open(directory)
-                .then(function(repo) {
-                    repository = repo;
+		Git.Repository.open(directory)
+			.then(function(repo) {
+				repository = repo;
 
                     return repository.fetchAll({
                                     callbacks: {
@@ -261,27 +261,27 @@ NEWSCHEMA('Application').make(function(schema) {
                 
 	});
         
-        schema.addWorkflow('config', function(error, model, id, callback) {
-                var item;
-                
-                if(id)
-                    item = APPLICATIONS.findItem('id', id);
-                else
-                    item = model;
-                
-		if (!item) {
-			error.push('error-app-404');
-			return callback();
-		}
-                
-                var filename = Path.join(CONFIG('directory-www'), item.linker, 'config');
-                
-                // copy default config file
-                if (!Fs.existsSync(filename)) {
-                    Fs.createReadStream(filename + '.sample').pipe(Fs.createWriteStream(filename));
-                }
-                
-                // modify config file for database and useradmin
+    schema.addWorkflow('config', function(error, model, id, callback) {
+    	var item;
+    	
+    	if(id)
+    		item = APPLICATIONS.findItem('id', id);
+    	else
+    		item = model;
+    	
+    	if (!item) {
+    		error.push('error-app-404');
+    		return callback();
+    	}
+    	
+    	var filename = Path.join(CONFIG('directory-www'), item.linker, 'config');
+    	
+    	// copy default config file
+    	if (!Fs.existsSync(filename)) {
+    		if (Fs.existsSync(filename + '.sample')) {
+    			Fs.createReadStream(filename + '.sample').pipe(Fs.createWriteStream(filename));
+    			
+    			// modify config file for database and useradmin
                 Fs.readFile(filename, 'utf8', function (err,data) {
                     if (err) {
                         error.push('template', err);
@@ -343,6 +343,8 @@ NEWSCHEMA('Application').make(function(schema) {
                         callback();
                     });
                 });
+    		}
+    	}
 	});
 
 	schema.setRemove(function(error, id, callback) {
