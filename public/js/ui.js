@@ -307,8 +307,11 @@ COMPONENT('dropdown', function() {
 		var builder = [];
 		var value = self.get();
 		var template = '<option value="{0}"{1}>{2}</option>';
+		var templateGroupStart = '<optgroup label="{0}">';
+		var templateGroupEnd = '</optgroup>';
 		var propText = self.attr('data-source-text') || 'name';
 		var propValue = self.attr('data-source-value') || 'id';
+		var propGroup = self.attr('data-source-group') || 'group';
 		var emptyText = self.attr('data-empty');
 
 		emptyText !== undefined && builder.push('<option value="">{0}</option>'.format(emptyText));
@@ -317,8 +320,14 @@ COMPONENT('dropdown', function() {
 			var item = arr[i];
 			if (item.length)
 				builder.push(template.format(item, value === item ? ' selected="selected"' : '', item));
-			else
-				builder.push(template.format(item[propValue], value === item[propValue] ? ' selected="selected"' : '', item[propText]));
+			else {
+				if (item[propGroup] === 'start')
+					builder.push(templateGroupStart.format(item[propText]));
+				else if (item[propGroup] === 'end')
+					builder.push(templateGroupEnd);
+				else
+					builder.push(template.format(item[propValue], value === item[propValue] ? ' selected="selected"' : '', item[propText]));
+			}
 		}
 
 		select.html(builder.join(''));
