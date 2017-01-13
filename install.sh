@@ -65,6 +65,7 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/node_modules/
     cd /www/
     npm install
+    npm install -g gulp
 
     #Key Generation
 
