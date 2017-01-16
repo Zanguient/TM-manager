@@ -53,7 +53,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y redis-server
     apt-get install -y texlive-latex-base
     apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
-    apt-get install -y libstdc++-4.9-dev libssl-dev g++
+    apt-get install -y libstdc++-4.9-dev libssl-dev g++ make
     apt-get upgrade -y
     curl https://get.acme.sh | sh
     mkdir /www/
