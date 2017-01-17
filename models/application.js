@@ -278,6 +278,10 @@ NEWSCHEMA('Application').make(function(schema) {
                 
                 // copy default config file
                 if (!Fs.existsSync(filename)) {
+                    // No default config file
+                    if( !Fs.existsSync(filename + '.sample'))
+                        return callback();
+                    
                     Fs.createReadStream(filename + '.sample').pipe(Fs.createWriteStream(filename));
                 }
                 
