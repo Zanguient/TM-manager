@@ -701,10 +701,10 @@ SuperAdmin.backup = function(callback) {
  * @param {Function(err)} callback
  */
 SuperAdmin.reload = function(callback) {
-	Exec('nginx -t', function(err, response) {
+	Exec('/usr/sbin/nginx -t', function(err, response) {
 		if (err)
 			return callback(err.toString());
-		Exec('nginx -s reload', (err, response) => callback(err && response));
+		Exec('/usr/sbin/nginx -s reload', (err, response) => callback(err && response));
 	});
 	return SuperAdmin;
 };

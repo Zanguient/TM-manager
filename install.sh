@@ -53,7 +53,7 @@ if [ "$userConsent" == "y" ]; then
     apt-get install -y redis-server
     apt-get install -y texlive-latex-base
     apt-get install -y texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-lang-french
-    apt-get install -y libstdc++-4.9-dev libssl-dev g++
+    apt-get install -y libstdc++-4.9-dev libssl-dev g++ make
     apt-get upgrade -y
     curl https://get.acme.sh | sh
     mkdir /www/
@@ -64,7 +64,8 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
     mkdir /www/node_modules/
     cd /www/
-    npm install total.js
+    npm install
+    npm install -g gulp
 
     #Key Generation
 
@@ -99,7 +100,9 @@ if [ "$userConsent" == "y" ]; then
     sed -i -e $subrepexp /www/nginx/manager.conf
     service nginx reload
 
-    rm /www/manager/user.guid
+    if [ -f "/www/manager/user.guid" ]; then
+        rm /www/manager/user.guid
+    fi
     read -p "Which user should TM-Manager use to run your applications ? (default root) : " user
     if id "$user" >/dev/null 2>&1; then
         printf "Using user -> %s\n" "$user"
