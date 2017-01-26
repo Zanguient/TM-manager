@@ -152,7 +152,7 @@ function json_apps_upgrade(id) {
 	if (!app)
 		return self.invalid().push('error-app-404');
 
-	SuperAdmin.logger('uograde: {0}', self, app);
+	SuperAdmin.logger('upgrade: {0}', self, app);
     
         self.$workflow('upgrade', id).$workflow('config',id, function(err, response) {
 		if (err)

@@ -62,10 +62,7 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/acme/
     mkdir /www/ssl/
     mkdir /www/www/
-    mkdir /www/node_modules/
     cd /www/
-    npm install
-    npm install -g gulp
 
     #Key Generation
 
@@ -113,6 +110,11 @@ if [ "$userConsent" == "y" ]; then
         printf "User %s does not exist. Using root instead.\n" "$user"
         echo "root:0:0" >> /www/manager/user.guid
     fi
+
+    #Install Packages
+    cd /www/manager
+    npm install
+    npm install -g gulp
 
     read -p "Do you wish to install cron job to start TM-Manager automaticly after server restart? (y/n) :" autorestart
     if [ "$autorestart" == "y" ]; then
