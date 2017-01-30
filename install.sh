@@ -114,8 +114,8 @@ if [ "$userConsent" == "y" ]; then
 
     #Install Packages
     cd /www/manager
-    npm install
-    npm install -g gulp
+    sudo npm install
+    sudo npm install -g gulp
 
     read -p "Do you wish to install cron job to start TM-Manager automaticly after server restart? (y/n) :" autorestart
     if [ "$autorestart" == "y" ]; then
