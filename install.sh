@@ -78,6 +78,7 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/www/
 	mkdir /www/node_modules/
     cd /www/
+
     npm install total.js
 	npm install -g total.js
 	npm install -g gulp
@@ -85,21 +86,18 @@ if [ "$userConsent" == "y" ]; then
     #Configuration
     cd
     apt-get install -y git
-
-	
     git clone https://github.com/ToManage/manager.git
     mv manager /www/
     cp /www/manager/config.sample /www/manager/config
     cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
     cp /www/manager/nginx.conf /etc/nginx/nginx.conf
     cp /www/manager/manager.conf /www/nginx/
-    
-	repexp=s/#domain#/$domain/g
+    repexp=s/#domain#/$domain/g
     httpenexp=s/#disablehttp#//g
     httpsenexp=s/#disablehttps#//g
 
     if [ "$httpEn" == "y" ]; then
-		sed -i -e $httpenexp /www/nginx/manager.conf
+        sed -i -e $httpenexp /www/nginx/manager.conf
 		sed -i -e $repexp /www/nginx/manager.conf
 		nginx -s reload
     fi
@@ -115,13 +113,12 @@ if [ "$userConsent" == "y" ]; then
 
 		# Copies NGINX configuration file again
 		cp /www/manager/manager.conf /www/nginx/
-
-		sed -i -e $httpsenexp /www/nginx/manager.conf
+        sed -i -e $httpsenexp /www/nginx/manager.conf
 		sed -i -e $repexp /www/nginx/manager.conf
 		nginx -s reload
-	fi
+    fi
 
-	rm /www/manager/user.guid
+        rm /www/manager/user.guid
 	echo ""
 	echo "---------------------------------------------------"
 	read -p $'Which user should SuperAdmin use to run your applications ? (default \e[104mroot\e[0m) : ' user
@@ -140,8 +137,7 @@ if [ "$userConsent" == "y" ]; then
 		# Writes out current crontab
         crontab -l > mycron
 		# Checks a cron job exists if not add it
-
-		crontab -l | grep '@reboot /bin/bash /www/manager/run.sh' || echo '@reboot /bin/bash /www/manager/run.sh' >> mycron
+        crontab -l | grep '@reboot /bin/bash /www/manager/run.sh' || echo '@reboot /bin/bash /www/manager/run.sh' >> mycron
         crontab mycron
         rm mycron
         echo "Cron job added."
