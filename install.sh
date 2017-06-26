@@ -1,38 +1,51 @@
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-printf "${RED}TM-Manager Installtion${NC}\n"
-echo "Installion assumes a clean install of Ubuntu 14.04"
-echo "Installion prompts are for creating a subdomain 'tm-manager for a domain name 'domain.tld' and accessing tm-manager via it"
-echo "you wil be prompted to provide both."
-echo "By default, a cer-key pair is generated using OpenSSL for HTTPS, if HTTPS is enabled"
-echo "You can find the cer-key pair in the /etc/ssl/<domain>/ folder."
-echo "You will be promted to enter details for the certificate"
-echo "TM-Manager uses these commands: lsof, ps, netstat, du, cat, free, df, tail, last, ifconfig, uptime, tar"
+echo ""
+echo "==================================================="
+echo -e "\e[41mSuperAdmin Installation\e[0m"
+echo "==================================================="
+echo ""
+echo -e "\e[90mInstallation assumes a clean installation of Ubuntu Server +16\e[0m"
+echo ""
+echo -e "\e[100m-->\e[0m Installation prompts are for creating URL for SuperAdmin."
+echo -e "\e[100m-->\e[0m A domain for SuperAdmin has to be mapped to this server when you want to use SSL."
+echo -e "\e[100m-->\e[0m \e[90mThis installation installs: Nginx, Node.js, GraphicsMagick and Git.\e[0m"
 
 # Root check
 if [[ $EUID -ne 0 ]]; then
-    printf "${RED}You must be a root user${NC}" 2>&1
+	echo -e "\e[91mYou must be a root user.\e[0m" 2>&1
     exit 1
 fi
 
 #User Consent
-printf "${RED}This setup requires the installation of the Nginx, Node.js and GraphicsMagick packages using apt-get!${NC}\n"
-read -p "Do you wish to permit this ? (y/n) : " userConsent
+echo ""
+read -p $'Do you wish to permit this? \e[104m(y/n)\e[0m : ' userConsent
 
 if [ "$userConsent" == "y" ]; then
-    read -p "Do you want to provide TM-Manager via HTTP? (y/n) : " httpEn
-    read -p "Do you want to provide TM-Manager via HTTPS? (y/n) : " httpsEn
+	read -p $'Do you want to provide SuperAdmin via HTTPS? \e[104m(y/n)\e[0m : ' httpsEn
+	echo ""
+
+	if [ "$httpsEn" == "n" ]; then
+		httpEn="y"
+	fi
 
     #User Input
-    read -p "Domain without protocol (e.g. domain.tk): " domain
-    read -p "Subdomain without protocol (e.g. manager): " subdomain
+	read -p $'Domain name without protocol (e.g. \e[100msuperadmin.yourdomain.com\e[0m): ' domain
+
+	echo ""
+	echo "---------------------------------------------------"
+	echo -e "SuperAdmin URL address will be:"
 
     if [ "$httpsEn" == "y" ]; then
-        read -p "Country Name (2 letter code) (e.g. IN): " certC
-        read -p "State or Province Name (e.g. Kerala): " certST
-        read -p "Locality Name (e.g. Kochi): " certL
-        read -p "Organization Name (e.g. Novocorp Industries Inc): " certO
-        read -p "Organizational Unit Name (e.g. IT department): " certOU
+		echo -e "\e[44mhttps://$domain\e[0m"
+	else
+		echo -e "\e[44mhttp://$domain\e[0m"
+	fi
+	echo "---------------------------------------------------"
+	echo ""
+
+	read -p $'Are you sure you want to continue? \e[104m(y/n)\e[0m : ' next
+
+	if [ "$next" == "n" ]; then
+		exit 1;
     fi
 
     #Prerequisits
@@ -63,45 +76,55 @@ if [ "$userConsent" == "y" ]; then
     mkdir /www/acme/
     mkdir /www/ssl/
     mkdir /www/www/
+	mkdir /www/node_modules/
     cd /www/
-
-    #Key Generation
-
-    mkdir /etc/ssl/${domain}
-    openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-    -subj "/C=$certC/ST=$certST/L=$certL/O=$certO/OU=$certOU/CN=$subdomain.$domain" \
-    -keyout /etc/ssl/${domain}/${subdomain}.key \
-    -out /etc/ssl/${domain}/${subdomain}.cer
+    npm install total.js
+	npm install -g total.js
+	npm install -g gulp
 
     #Configuration
     cd
     apt-get install -y git
+
+	
     git clone https://github.com/ToManage/manager.git
     mv manager /www/
     cp /www/manager/config.sample /www/manager/config
     cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
     cp /www/manager/nginx.conf /etc/nginx/nginx.conf
     cp /www/manager/manager.conf /www/nginx/
-    repexp=s/#domain#/$domain/g
-    subrepexp=s/#subdomain#/$subdomain/g
+    
+	repexp=s/#domain#/$domain/g
     httpenexp=s/#disablehttp#//g
     httpsenexp=s/#disablehttps#//g
 
     if [ "$httpEn" == "y" ]; then
-        sed -i -e $httpenexp /www/nginx/manager.conf
+		sed -i -e $httpenexp /www/nginx/manager.conf
+		sed -i -e $repexp /www/nginx/manager.conf
+		nginx -s reload
     fi
     if [ "$httpsEn" == "y" ]; then
-        sed -i -e $httpsenexp /www/nginx/manager.conf
-    fi
+		echo "Generating SSL ..."
 
-    sed -i -e $repexp /www/nginx/manager.conf
-    sed -i -e $subrepexp /www/nginx/manager.conf
-    service nginx reload
+		sed -i -e $repexp /www/nginx/manager.conf
+		sed -i -e $httpenexp /www/nginx/manager.conf
+		nginx -s reload
 
-    if [ -f "/www/manager/user.guid" ]; then
-        rm /www/manager/user.guid
-    fi
-    read -p "Which user should TM-Manager use to run your applications ? (default root) : " user
+		# Generates SSL
+		bash /www/manager/ssl.sh $domain
+
+		# Copies NGINX configuration file again
+		cp /www/manager/manager.conf /www/nginx/
+
+		sed -i -e $httpsenexp /www/nginx/manager.conf
+		sed -i -e $repexp /www/nginx/manager.conf
+		nginx -s reload
+	fi
+
+	rm /www/manager/user.guid
+	echo ""
+	echo "---------------------------------------------------"
+	read -p $'Which user should SuperAdmin use to run your applications ? (default \e[104mroot\e[0m) : ' user
     if id "$user" >/dev/null 2>&1; then
         printf "Using user -> %s\n" "$user"
         uid=$(id -u ${user})
@@ -112,25 +135,29 @@ if [ "$userConsent" == "y" ]; then
         echo "root:0:0" >> /www/manager/user.guid
     fi
 
-    #Install Packages
-    cd /www/manager
-    npm install
-    npm install -g gulp
-
-    read -p "Do you wish to install cron job to start TM-Manager automaticly after server restart? (y/n) :" autorestart
+	read -p $'Do you wish to install cron job to start SuperAdmin automatically after server restarts? \e[104m(y/n)\e[0m :' autorestart
     if [ "$autorestart" == "y" ]; then
-        #write out current crontab
+		# Writes out current crontab
         crontab -l > mycron
-        #check cron job exists if not add it
-        crontab -l | grep '@reboot /bin/bash /www/manager/run.sh' || echo '@reboot /bin/bash /www/manager/run.sh' >> mycron
+		# Checks a cron job exists if not add it
+
+		crontab -l | grep '@reboot /bin/bash /www/manager/run.sh' || echo '@reboot /bin/bash /www/manager/run.sh' >> mycron
         crontab mycron
         rm mycron
         echo "Cron job added."
     fi
+	echo ""
+	echo "---------------------------------------------------"
+	echo -e "\e[100m--> SuperAdmin uses these commands:\e[0m"
+	echo "lsof, ps, netstat, du, cat, free, df, tail, last, ifconfig, uptime, tar, git, npm,"
+	echo "wc, grep, cp, mkdir"
+	echo "---------------------------------------------------"
+	echo ""
 
     #Starting
+	echo -e "\e[42mSTARTING...\e[0m"
     /bin/bash /www/manager/run.sh
 
 else
-    echo "Sorry, this installation cannot continue."
+	echo -e "\e[41mSorry, this installation cannot continue.\e[0m"
 fi

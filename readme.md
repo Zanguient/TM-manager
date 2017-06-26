@@ -4,8 +4,9 @@
 
 # Installation
 
-- __SuperAdmin__ (v5.0.0) needs latest Total.js from NPM `+v2.3.0`
+- __SuperAdmin__ (v5.0.0) needs latest Total.js from NPM `+v2.6.0`
 - __License__: [MIT](license.txt)
+- [__Live chat with professional support__](https://messenger.totaljs.com)
 - [__HelpDesk with professional support__](https://helpdesk.totaljs.com)
 
 __IMPORTANT__
@@ -39,10 +40,14 @@ __SuperAdmin requirements:__
 - `npm`
 
 __To install SuperAdmin run commands bellow:__
-- run `$ sudo wget https://raw.githubusercontent.com/totaljs/superadmin/master/install.sh`
-- run `$ sudo bash install.sh`
-- run `$ cd superadmin` and `$ bash run.sh`
+
+```bash
+$ sudo wget https://cdn.totaljs.com/superadmin.sh && bash superadmin.sh
+```
+
 - login __user:__ `admin`, __password:__ `admin` (credentials are stored in `/www/superadmin/config`)
+- manually run (if you didn't register cron in the installation) `$ cd /www/superadmin/` and `$ bash run.sh`
+
 
 ---
 
